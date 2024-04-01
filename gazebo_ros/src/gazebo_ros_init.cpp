@@ -149,7 +149,63 @@ void GazeboRosInit::Load(int argc, char ** argv)
   // Initialize ROS with arguments
   if (!rclcpp::ok()) {
     rclcpp::init(argc, argv);
-    impl_->ros_node_ = gazebo_ros::Node::Get();
+
+    if (argc != 5){
+      std::cout << "Please run libgazebo_ros_init.so with 'namespace' argument." << std::endl;
+      return;
+    }
+
+    std::string ns = argv[4];
+
+    // std::string ns = "client_1";
+
+    std::string sdfString = R"(
+        <sdf version="1.7">
+            <plugin name="gazebo_ros_init">
+                <ros>
+                    <namespace>/NAMESPACE_PLACEHOLDER</namespace>
+                    <argument>__name:=gazebo</argument>
+                </ros>
+            </plugin>
+        </sdf>
+    )";
+
+    std::string placeholder = "NAMESPACE_PLACEHOLDER";
+    size_t pos = sdfString.find(placeholder);
+    if (pos != std::string::npos) {
+        sdfString.replace(pos, placeholder.length(), ns);
+    }
+
+    // Initialize an SDF object
+    sdf::SDFPtr sdf_obj = std::make_shared<sdf::SDF>();
+    sdf_obj->SetFromString(sdfString);
+
+    // Get the root element
+    sdf::ElementPtr sdfRoot = sdf_obj->Root();
+    if (!sdfRoot) {
+        std::cerr << "Failed to get SDF root element" << std::endl;
+        return;
+    }
+
+    // Get the plugin element
+    sdf::ElementPtr pluginElement = sdfRoot->GetElement("plugin");
+    if (!pluginElement) {
+        std::cerr << "Failed to get plugin element" << std::endl;
+        return;
+    }
+
+    // Extract ROS-related information
+    sdf::ElementPtr rosElement = pluginElement->GetElement("ros");
+    if (rosElement) {
+        std::string namespaceValue = rosElement->Get<std::string>("namespace");
+        std::cout << "Namespace: " << namespaceValue << std::endl;
+    }
+    impl_->ros_node_ = gazebo_ros::Node::Get(pluginElement);
+
+    RCLCPP_INFO(impl_->ros_node_->get_logger(), "argc: %d", argc);
+    for (int i = 0; i < argc; ++i) {
+        RCLCPP_INFO(impl_->ros_node_->get_logger(), "argv[%d]: %s", i, argv[i]);
+    }
   } else {
     impl_->ros_node_ = gazebo_ros::Node::Get();
     RCLCPP_WARN(
