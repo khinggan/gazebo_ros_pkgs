@@ -150,21 +150,25 @@ void GazeboRosInit::Load(int argc, char ** argv)
   if (!rclcpp::ok()) {
     rclcpp::init(argc, argv);
 
-    if (argc != 5){
+    if (argc != 55){
       std::cout << "Please run libgazebo_ros_init.so with 'namespace' argument." << std::endl;
+      std::cout << "argc: " << argc << std::endl;
+      for (int i = 0; i < argc; ++i) {
+        std::cout << "Argument " << i << ": " << argv[i] << std::endl;
+      }
       return;
     }
 
-    std::string ns = argv[4];
+    std::string ns = argv[50];
 
     // std::string ns = "client_1";
 
     std::string sdfString = R"(
         <sdf version="1.7">
-            <plugin name="gazebo_ros_init">
+            <plugin name="gazebo">
                 <ros>
                     <namespace>/NAMESPACE_PLACEHOLDER</namespace>
-                    <argument>__name:=gazebo</argument>
+                    <argument></argument>
                 </ros>
             </plugin>
         </sdf>
@@ -217,8 +221,9 @@ void GazeboRosInit::Load(int argc, char ** argv)
   // Offer transient local durability on the clock topic so that if publishing is infrequent (e.g.
   // the simulation is paused), late subscribers can receive the previously published message(s).
   impl_->clock_pub_ = impl_->ros_node_->create_publisher<rosgraph_msgs::msg::Clock>(
-    "/clock",
-    rclcpp::QoS(rclcpp::KeepLast(10)).transient_local());
+    "clock",
+    10);
+    // rclcpp::QoS(rclcpp::KeepLast(10)).transient_local());
 
 #ifdef GAZEBO_ROS_HAS_PERFORMANCE_METRICS
   impl_->performance_metrics_pub_ =
