@@ -33,7 +33,7 @@ from scripts import GazeboRosPaths
 
 
 def generate_launch_description():
-    namespace = LaunchConfiguration('namespace')
+    # namespace = LaunchConfiguration('namespace')
 
     cmd = [
         'gzserver',
@@ -55,8 +55,8 @@ def generate_launch_description():
         _arg_command('iters'), ' ', LaunchConfiguration('iters'), ' ',
         _boolean_command('minimal_comms'),
         _plugin_command('init'), ' ',
-        namespace,
-        # _plugin_command('factory'), ' ',
+        'robot_1', ' ',
+        _plugin_command('factory'), ' ',
         # _plugin_command('force_system'), ' ',
         # Wait for (https://github.com/ros-simulation/gazebo_ros_pkgs/pull/941)
         # _plugin_command('force_system'), ' ',
@@ -97,7 +97,7 @@ def generate_launch_description():
             description='Set "true" to output version information.'
         ),
         DeclareLaunchArgument(
-            'verbose', default_value='false',
+            'verbose', default_value='true',
             description='Set "true" to increase messages written to terminal.'
         ),
         DeclareLaunchArgument(

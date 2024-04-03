@@ -20,6 +20,7 @@
 
 #include <memory>
 #include <string>
+#include <sstream>
 #include <vector>
 
 namespace gazebo_ros
@@ -107,6 +108,25 @@ Node::SharedPtr Node::Get(sdf::ElementPtr sdf)
 
   // Parse the qos tag
   node->qos_ = gazebo_ros::QoS(sdf, name, ns, node_options);
+
+  return node;
+}
+
+Node::SharedPtr Node::Get(std::string ns)
+{
+  Node::SharedPtr node = static_node_.lock();
+
+  if (!node) {
+    
+    std::ostringstream oss;
+    oss << ns;
+    std::string var = oss.str();
+
+    // rclcpp::NodeOptions node_options;
+    // node_options.allow_undeclared_parameters(true);
+    node = CreateWithArgs("gazebo", var);
+    static_node_ = node;
+  }
 
   return node;
 }

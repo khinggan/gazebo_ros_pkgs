@@ -86,6 +86,9 @@ public:
    */
   static SharedPtr Get(sdf::ElementPtr _sdf);
 
+  /// create a node with namespace
+  static SharedPtr Get(std::string ns);
+
   /// Create a #gazebo_ros::Node and add it to the global #gazebo_ros::Executor.
   /**
    * \details This will call rclcpp::init if it hasn't been called yet.

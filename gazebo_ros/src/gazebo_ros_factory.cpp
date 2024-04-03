@@ -137,7 +137,22 @@ void GazeboRosFactoryPrivate::OnWorldCreated(const std::string & _world_name)
   world_ = gazebo::physics::get_world();
 
   // ROS transport
-  ros_node_ = gazebo_ros::Node::Get();
+  // ros_node_ = gazebo_ros::Node::Get();
+  ros_node_ = gazebo_ros::Node::Get("robot_1");
+
+  std::map<std::string, std::vector<std::string>> myMap;
+  myMap = ros_node_->rclcpp::Node::get_service_names_and_types(); // or get_topic_names_and_types()
+
+  for (const auto& pair : myMap) {
+    std::cout << pair.first << ": ";
+    for (const auto& value : pair.second) {
+        std::cout << value << " ";
+    }
+    std::cout << std::endl;
+  }
+  
+  std::cout << "================================" << std::endl;
+  // std::cout<< ros_node_->rclcpp::Node::get_name() << ros_node_->rclcpp::Node::get_namespace() << std::endl;
 
   model_list_service_ = ros_node_->create_service<gazebo_msgs::srv::GetModelList>(
     "get_model_list",
@@ -156,13 +171,22 @@ void GazeboRosFactoryPrivate::OnWorldCreated(const std::string & _world_name)
     std::bind(
       &GazeboRosFactoryPrivate::DeleteEntity, this,
       std::placeholders::_1, std::placeholders::_2));
-
+  
   // Gazebo transport
   gz_node_ = gazebo::transport::NodePtr(new gazebo::transport::Node());
   gz_node_->Init(_world_name);
   gz_factory_pub_ = gz_node_->Advertise<gazebo::msgs::Factory>("~/factory");
   gz_factory_light_pub_ = gz_node_->Advertise<gazebo::msgs::Light>("~/factory/light");
   gz_request_pub_ = gz_node_->Advertise<gazebo::msgs::Request>("~/request");
+
+  myMap = ros_node_->rclcpp::Node::get_service_names_and_types();
+  for (const auto& pair : myMap) {
+    std::cout << pair.first << ": ";
+    for (const auto& value : pair.second) {
+        std::cout << value << " ";
+    }
+    std::cout << std::endl;
+  }
 }
 
 void GazeboRosFactoryPrivate::GetModelList(
