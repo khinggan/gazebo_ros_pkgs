@@ -47,10 +47,10 @@
 	args="$(arg command_arg1) $(arg command_arg2) $(arg command_arg3) -e $(arg physics) $(arg extra_gazebo_args) $(arg world_name)"
   required="$(arg server_required)" />
 
-  <!-- start gazebo client -->
+  <!-- start gazebo client 
   <group if="$(arg gui)">
     <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" output="$(arg output)" args="$(arg command_arg3)"
     required="$(arg gui_required)"/>
-  </group>
+  </group> -->
 
 </launch>
